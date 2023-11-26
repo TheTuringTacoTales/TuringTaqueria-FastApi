@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models.models import Base, User
 from models.db_init import init_db
-from models.auth import authenticate_user, create_access_token, get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
+from models.auth import Username, Password, authenticate_user, create_access_token, get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -28,7 +28,7 @@ async def root():
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     with SessionLocal() as db:
-        user = authenticate_user(db, form_data.username, form_data.password)
+        user = authenticate_user(db, Username(form_data.username), Password(form_data.password))
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -36,10 +36,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
                 headers={"WWW-Authenticate": "Bearer"},
             )
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
+        auth_token = create_access_token(
             data={"sub": user.username}, expires_delta=access_token_expires
         )
-        return {"access_token": access_token, "token_type": "bearer"}
+        return {"access_token": auth_token.access_token, "token_type": "bearer"}
 
 @app.get("/users/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
