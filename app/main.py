@@ -1,25 +1,19 @@
 from datetime import timedelta
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from models.models import Base, User
-from models.db_init import init_db
-from models.auth import Username, Password, authenticate_user, create_access_token, get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
+from sqlmodel import Session
+from typing import List
 
+from model.product import Product
+from security.model import User, Username, Password, HashedPassword
+from security.auth import authenticate_user, create_access_token, get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
+from db_init import init_db
+from db.sqlite import engine
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-# Initialize the DB
 init_db()
 
 app = FastAPI()
+
 
 @app.get("/")
 async def root():
@@ -27,7 +21,7 @@ async def root():
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    with SessionLocal() as db:
+    with Session(engine) as db: # type: ignore
         user = authenticate_user(db, Username(form_data.username), Password(form_data.password))
         if not user:
             raise HTTPException(
@@ -44,3 +38,12 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @app.get("/users/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@app.get("/products/{product_id}", response_model=Product)
+def read_product(product_id: int) -> Product:
+    with Session(engine) as db: # type: ignore
+        product = db.query(Product).filter(Product.id == product_id).first()
+        if product is None:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return product

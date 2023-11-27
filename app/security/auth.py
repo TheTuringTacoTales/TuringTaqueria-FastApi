@@ -4,10 +4,10 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from .models import User
-from .db_init import SessionLocal
-from pydantic import BaseModel
+from .model import User, Username, Password, HashedPassword, AuthToken
+
+from sqlmodel import Session
+from db.sqlite import engine
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -17,19 +17,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-class Username(str):
-    pass
-
-class Password(str):
-    pass
-
-class HashedPassword(str):
-    pass
-
-class AuthToken(BaseModel):
-    access_token: str
-    token_type: str
 
 
 def verify_password(plain_password: Password, hashed_password: HashedPassword):
@@ -72,7 +59,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    with SessionLocal() as db:
+    with Session(engine) as db: # type: ignore
         user = get_user(db, username=username)
         if user is None:
             raise credentials_exception
