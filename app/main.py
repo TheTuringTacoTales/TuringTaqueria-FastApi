@@ -1,5 +1,5 @@
 from datetime import timedelta
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Security
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 from typing import List
@@ -40,7 +40,7 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 @app.get("/products", response_model=list[Product]) 
-def read_products() -> List[Product]:
+def read_products(current_user: User = Security(get_current_user)) -> List[Product]:
     with Session(engine) as db: # type: ignore
         products = db.query(Product).all()
         return products
