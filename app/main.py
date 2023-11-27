@@ -39,6 +39,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
+@app.get("/products", response_model=list[Product]) 
+def read_products() -> List[Product]:
+    with Session(engine) as db: # type: ignore
+        products = db.query(Product).all()
+        return products
 
 @app.get("/products/{product_id}", response_model=Product)
 def read_product(product_id: int) -> Product:
