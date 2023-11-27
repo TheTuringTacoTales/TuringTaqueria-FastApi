@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 
-from db_init import init_db
+from backend.api.main_endpoints import router as api_main_router
+from backend.api.shopping_cart_endpoints import router as api_cart_router
+import backend.db_init as db
 
-from api.main_endpoints import router as api_main_router
-from api.shopping_cart_endpoints import router as api_cart_router
-
-init_db()
+db.init_db()
 
 app = FastAPI()
 

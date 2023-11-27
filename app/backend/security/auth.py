@@ -7,7 +7,7 @@ from fastapi import Depends, HTTPException, status
 from .model import User, Username, Password, HashedPassword, AuthToken
 
 from sqlmodel import Session
-from db.sqlite import engine
+from ..db.sqlite import engine
 
 # to get a string like this run:
 # openssl rand -hex 32

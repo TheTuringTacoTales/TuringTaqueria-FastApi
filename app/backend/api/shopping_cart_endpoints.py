@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from model.shopping_cart import ShoppingCart, CartItem
-from model.product import Product
+from ..model.shopping_cart import ShoppingCart, CartItem
+from ..model.product import Product
 
-from security.auth import get_current_user, User
+from ..security.auth import get_current_user, User
 
-from db.sqlite import engine
+from ..db.sqlite import engine
 
 router = APIRouter()
 

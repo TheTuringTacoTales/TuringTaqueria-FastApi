@@ -1,9 +1,10 @@
 from sqlmodel import Field, SQLModel, Session, create_engine
-from security.model import User
-from model.product import Product, ProductType
 from passlib.context import CryptContext
 
-from db.sqlite import engine, create_db_and_tables
+from .security.model import User
+from .model.product import Product, ProductType
+
+from .db.sqlite import engine, create_db_and_tables
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

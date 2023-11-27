@@ -4,11 +4,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 from typing import List
 
-from model.product import Product
-from security.model import User, Username, Password
-from security.auth import authenticate_user, create_access_token, get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..model.product import Product
+from ..security.model import User, Username, Password
+from ..security.auth import authenticate_user, create_access_token, get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
 
-from db.sqlite import engine
+from ..db.sqlite import engine
 
 router = APIRouter()
 
