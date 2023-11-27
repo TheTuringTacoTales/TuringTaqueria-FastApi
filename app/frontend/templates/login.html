@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Turing Taqueria</title>
+    <style>
+        body {
+            background-image: url('static/images/TuringTaqueria-Login.jpg');
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            max-width: 300px;
+            margin: 100px auto;
+            margin-top: 400px; 
+            background: #f3f3f3;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Turing Taqueria</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+    
+            try {
+                const response = await fetch('/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Login failed');
+                }
+    
+                const data = await response.json();
+                console.log('Login successful:', data);
+                localStorage.setItem('token', data.access_token);
+                window.location.href = '/restaurant'
+                // Redirect or further processing
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);            }
+            });
+    </script>
+    
+</body>
+</html>
