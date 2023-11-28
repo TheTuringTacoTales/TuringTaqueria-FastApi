@@ -29,6 +29,10 @@
     </style>
 </head>
 <body>
+    <div id="cartIcon" onclick="goToCart()" style="position: fixed; top: 10px; right: 10px; cursor: pointer;">
+        🛒 <span id="cartCount">0</span> Items
+    </div>
+    <br />
     <div class="product-container" id="productContainer">
         <!-- Products will be loaded here -->
     </div>
@@ -58,11 +62,50 @@
         }
 
         async function addToCart(productId) {
-            // Logic to add product to cart
             console.log('Adding product to cart:', productId);
+            const token = localStorage.getItem('token');
+            const response = await fetch('/cart', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ product_id: productId, quantity: 1 })
+            });
+
+            if (response.ok) {
+                // Update cart count or give some feedback
+                fetchCart(); // Update cart count
+            } else {
+                console.error('Failed to add item to cart');
+            }
+        }
+        
+        function goToCart() {
+            window.location.href = '/show-cart'; 
         }
 
-        fetchProducts();
+        async function fetchCart() {
+            const token = localStorage.getItem('token'); // Retrieve the stored token
+            const response = await fetch('/cart', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                const cartItems = await response.json();
+                const itemCount = cartItems.length; // Assuming each item is a separate entry in the cart
+                document.getElementById('cartCount').innerText = itemCount;
+            } else {
+                console.error('Failed to fetch cart');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            fetchCart(); // Fetch cart data when the page loads
+            fetchProducts(); // Existing function to load products
+        });
+
     </script>
 </body>
 </html>

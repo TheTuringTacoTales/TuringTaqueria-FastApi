@@ -9,8 +9,8 @@ class CartItem(SQLModel, table=True):
     cart_id: Optional[int] = Field(default=None, foreign_key="shopping_carts.id")
     product_id: int = Field(foreign_key="products.id")
     quantity: int
-
-    product: Product = Relationship()
+    
+    product: Product = Relationship(sa_relationship_kwargs=dict(lazy="joined"))
     cart: "ShoppingCart" = Relationship()
 
 class ShoppingCart(SQLModel, table=True):
@@ -18,4 +18,4 @@ class ShoppingCart(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.id")
-    cart_items: List[CartItem] = Relationship(back_populates="cart")
+    cart_items: List[CartItem] = Relationship(back_populates="cart", sa_relationship_kwargs=dict(lazy="joined"))

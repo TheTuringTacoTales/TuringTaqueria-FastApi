@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session
+from pydantic import BaseModel
+from sqlmodel import Session, select
 
 from ..model.shopping_cart import ShoppingCart, CartItem
 from ..model.product import Product
@@ -16,13 +17,24 @@ def get_db():
     with Session(engine) as db:
         yield db
 
+class CartItemResponse(BaseModel):
+    id: int
+    cart_id: int
+    product_id: int
+    product_name: str
+    product_price: float
+    quantity: int
+
 # GET endpoint to retrieve user's cart
-@router.get("/cart")
+@router.get("/cart", response_model=list[CartItemResponse])
 def get_cart(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    cart = db.query(ShoppingCart).filter(ShoppingCart.user_id == current_user.id).first()
-    if not cart:
+    query = select(ShoppingCart).where(ShoppingCart.user_id == current_user.id)
+    result = db.exec(query).unique().first()
+    response = [CartItemResponse(id=i.id, cart_id=i.cart_id, product_id=i.product.id, product_name=i.product.name, product_price=i.product.price, quantity=i.quantity) for i in result.cart_items]
+    print(response)
+    if not result:
         raise HTTPException(status_code=404, detail="Shopping cart not found")
-    return cart.cart_items
+    return response
 
 # POST endpoint to add an item to the cart
 @router.post("/cart")

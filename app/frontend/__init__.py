@@ -18,3 +18,7 @@ def get_login(request: Request):
 @router.get("/restaurant")
 def get_login(request: Request):
     return templates.TemplateResponse("products.html", {"request": request})    
+
+@router.get("/show-cart")
+def get_login(request: Request):
+    return templates.TemplateResponse("cart.html", {"request": request})        
