@@ -27,6 +27,6 @@ Detailed instructions on setting up and running the project will be provided soo
 We welcome contributions and suggestions to improve this application. Please feel free to submit issues and pull requests.
 
 ## License
-This project is open source and available under BSD 3-Clause License.
+This project is open source and available under [BSD 3-Clause License](./LICENSE).
 
 Stay tuned for more updates and happy coding!
